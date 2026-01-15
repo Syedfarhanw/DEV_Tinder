@@ -3,29 +3,12 @@ require("dotenv").config();
 
 const app = express();
 
-app.get("/user", (req, res) => {
-    res.send({firstName: "Syed", lastName: "Farhan"})
-});
-
-app.post("/user/:userId", (req, res) => {
-    console.log(req.params);
-    res.send({firstName: "Syed", lastName: "Farhan"})
-})
-
-app.post("/user", (req, res) => {
-    res.send("Data saved Successfully")
-})
-
-app.use("/hello/2",(req, res) => {
-    res.send("Hellooooo")
-});;
-
-app.use("/hello",(req, res) => {
-    res.send("Hello2")
-})
-
-app.use("/test",(req, res) => {
-    res.send("Hello Test")
+app.use("/user", (req, res, next) => {
+    // res.send("response 1");
+    next()
+},
+ (req, res) => {
+    res.send("response 2");
 });
 
 
