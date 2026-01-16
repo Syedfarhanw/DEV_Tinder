@@ -1,31 +1,25 @@
 const express = require("express");
 require("dotenv").config();
-const { adminAuth, userAuth } = require("./middlewares/auth")
 
 const app = express();
 
-app.use("/admin", adminAuth )
-
-
-app.get("/admin/getAllData", (req, res) => {
-    res.send("Feteched Data");
-})
-
-app.delete("/admin/deletetAllData", (req, res) => {
-    res.send("Deleted Data")
-})
-
-app.post("/user/login", (req, res) => {
-    res.send("User logged in Successfully");
-})
-
-app.get("/user/data", userAuth, (req, res) => {
-    res.send("user data fetched")
+app.get("/getuserdata", (req, res) => {
+    // try {
+        
+        throw new Error("fefi")
+        res.send("user data fetched")
+    // } catch(err) {
+    //     res.status(500).send("something went wrong");
+    // }
+    
 })
 
 
-app.use("/",(req, res) => {
-    res.send("Welcome to Node.js Learning ")
+app.use("/",(err, req, res, next) => {
+    if(err) {
+        // LOg your error
+        res.status(500).send("something went wrong");
+    }
 });
 
 const port = process.env.PORT || 5000
