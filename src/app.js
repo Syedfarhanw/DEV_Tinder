@@ -70,9 +70,19 @@ app.get("/feed", async (req, res) => {
  })
 
     app.patch("/user/:id", async (req, res) => {
-        const userId = req.params.id;
+        const userId = req.params?.id;
         const data = req.body;
         try {
+            const ALLOWED_UPDATES = ["photoUrl", "age", "about", "skills", "gender"]
+            const isAllowed = Object.keys(data).every((k) => {
+                return ALLOWED_UPDATES.includes(k)
+        })
+            if(!isAllowed) {
+                throw new Error("Update not allowed")
+            }
+            if(data?.skills.length > 10) {
+                throw new Error("update not allowed")
+            }
             const UpadtedData = await User.findOneAndUpdate({_id: userId}, data, { new: true, runValidators: true });
             if(!UpadtedData) {
                 res.status(404).send({message: `User not found with id:${userId}`})
