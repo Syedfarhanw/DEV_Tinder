@@ -73,10 +73,13 @@ app.get("/feed", async (req, res) => {
         const userId = req.params.id;
         const data = req.body;
         try {
-            const UpadtedData = await User.findOneAndUpdate({_id: userId}, data, { new: true });
+            const UpadtedData = await User.findOneAndUpdate({_id: userId}, data, { new: true, runValidators: true });
+            if(!UpadtedData) {
+                res.status(404).send({message: `User not found with id:${userId}`})
+            }
             res.status(200).send({message: "user updated successfully", data: UpadtedData})
         } catch(err) {
-            res.status(400).send({message: "something went wrong", err})
+            res.status(400).send({message: "update failed:" + err.message})
         }
     })
 
