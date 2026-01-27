@@ -5,9 +5,12 @@ const User = require("./models/user");
 const user = require("./models/user");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt")
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken")
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 const port = process.env.PORT || 5000;
 
@@ -42,6 +45,9 @@ app.post("/login", async (req, res) => {
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if(isPasswordValid) {
+            // Create a JWT Token
+            const token = await jwt.sign({_id: user._id},  process.env.JWTSECRET)
+            // Add the token to cookie and send the response back to user
             res.status(200).send({message: "Login Successfull!!!"})
         } else {
             throw new Error("Invalid Credentials");
@@ -49,6 +55,28 @@ app.post("/login", async (req, res) => {
     } catch (err) {
         res.status(400).send({message: `Error :` + err.message});
     }
+})
+
+
+// Get Profile
+app.get("/profile", async (req, res) => {
+    try{
+    const cookies = req.cookies;
+    const {token} = cookies;
+    if(!token) {
+        throw new Error("Invalid Token");
+    }
+    const decodedMessage = await jwt.verify(token,  process.env.JWTSECRET)
+    const {_id} = decodedMessage 
+    console.log(decodedMessage);
+    const user = await User.findById(_id)
+    if(!user) {
+        throw new Error("User does not exist")
+    }
+    res.send(user)
+} catch(err) { 
+    res.status(400).send("ERROR :", + err.message)
+}
 })
 
 // Get User by email
